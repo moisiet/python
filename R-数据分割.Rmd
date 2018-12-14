@@ -1,0 +1,93 @@
+---
+title: "R-数据分割"
+author:
+  - 数据小丸子-moisiets
+documentclass: ctexart
+output:
+  rticles::ctex:
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
+classoption: "hyperref,"
+---
+
+#加载数据
+```{r}
+data(iris)
+head(iris)
+#去掉Species项，因为该项为因子型
+iris.removeSpecies=iris[,!names(iris)%in%c("Species")]
+```
+
+
+```{r}
+#有放回的从x中(即1和2)选择size个数据，选择1的概率为0.8，选择2的概率为0.2，并返回由1,2组成的向量
+ince=sample(x=2,size=nrow(iris.removeSpecies),replace=TRUE,prob=c(0.8,0.2))
+table(ince)
+trainset=iris.removeSpecies[ince==1,]
+testset=iris.removeSpecies[ince==2,]
+head(trainset)
+```
+
+```{r}
+set.seed(1234)#这句可以不要，只是保证大家得到的数据跟我的一致
+num=nrow(iris.removeSpecies)
+#从1:num中无放回随机选择size个数，然后将这几个数返回
+ince=sample(x=1:num,size=num*0.8,replace=FALSE)
+head(ince)
+trainset=iris.removeSpecies[ince,]
+testset=iris.removeSpecies[-ince,]
+```
+
+```{r}
+set.seed(1234)
+num=nrow(iris.removeSpecies)
+#将数据集划分成breaks份，并返回一个向量
+ince=cut(x=1:num,breaks=4,labels=FALSE)
+ince
+trainset=iris.removeSpecies[ince!=1,]
+testset=iris.removeSpecies[ince==1,]
+```
+
+```{r}
+library(caret)
+set.seed(1234)
+#参数y指定划分的列依据，p指定训练集的比例，list为FALSE指定返回值为向量，而非列表
+ince=createDataPartition(y=iris$Species,p=0.8,list=FALSE)
+table(iris$Species)
+trainset=iris[ince,]
+testset=iris[-ince,]
+table(trainset$Species)
+```
+
+
+```{r}
+library(caTools)
+set.seed(1234)
+ince=sample.split(Y=iris$Species,SplitRatio = 0.8)
+table(iris$Species)
+trainset=iris[ince,]
+testset=iris[-ince,]
+table(trainset$Species)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
